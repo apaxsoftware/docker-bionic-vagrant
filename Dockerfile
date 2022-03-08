@@ -1,36 +1,49 @@
-# Docker image to use with Vagrant
 FROM ubuntu:18.04
+LABEL MAINTAINER="APAX Software"
 
-LABEL maintainer="APAX Software"
+ENV DEBIAN_FRONTEND noninteractive
 
-ENV container docker
-RUN apt-get update -y
+# Install packages needed for SSH and interactive OS
+RUN apt-get update && \
+    yes | unminimize && \
+    apt-get -y install \
+        openssh-server \
+        passwd \
+        sudo \
+        man-db \
+        curl \
+        wget \
+        vim-tiny && \
+    apt-get -qq clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN apt-get install -y --no-install-recommends ssh sudo python-dev libffi-dev systemd openssh-client libwww-perl libjpeg8-dev acl libxml2-dev libxslt-dev
+# Enable systemd (from Matthew Warman's mcwarman/vagrant-provider)
+RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+    rm -f /lib/systemd/system/multi-user.target.wants/*; \
+    rm -f /etc/systemd/system/*.wants/*; \
+    rm -f /lib/systemd/system/local-fs.target.wants/*; \
+    rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
+    rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
+    rm -f /lib/systemd/system/basic.target.wants/*; \
+    rm -f /lib/systemd/system/anaconda.target.wants/*;
 
-# Needed to run systemd
-# VOLUME [ "/sys/fs/cgroup" ]
-# Doesn't appear to be necessary? See comments
-
-RUN apt-get -y install puppet
-
-# Add vagrant user and key for SSH
-RUN useradd --create-home -s /bin/bash vagrant
-RUN echo -n 'vagrant:vagrant' | chpasswd
-RUN echo 'vagrant ALL = NOPASSWD: ALL' > /etc/sudoers.d/vagrant
-RUN chmod 440 /etc/sudoers.d/vagrant
-RUN mkdir -p /home/vagrant/.ssh
-RUN chmod 700 /home/vagrant/.ssh
-RUN echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ==" > /home/vagrant/.ssh/authorized_keys
-RUN chmod 600 /home/vagrant/.ssh/authorized_keys
-RUN chown -R vagrant:vagrant /home/vagrant/.ssh
-RUN sed -i -e 's/Defaults.*requiretty/#&/' /etc/sudoers
-RUN sed -i -e 's/\(UsePAM \)yes/\1 no/' /etc/ssh/sshd_config
-
-# Start SSH
-RUN mkdir /var/run/sshd
+# Enable ssh for vagrant
+RUN systemctl enable ssh.service;
 EXPOSE 22
-RUN /usr/sbin/sshd
 
-# Start Systemd (systemctl)
+# Create the vagrant user
+RUN useradd -m -G sudo -s /bin/bash vagrant && \
+    echo "vagrant:vagrant" | chpasswd && \
+    echo 'vagrant ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/vagrant && \
+    chmod 440 /etc/sudoers.d/vagrant
+
+# Establish ssh keys for vagrant
+RUN mkdir -p /home/vagrant/.ssh; \
+    chmod 700 /home/vagrant/.ssh
+ADD https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub /home/vagrant/.ssh/authorized_keys
+RUN chmod 600 /home/vagrant/.ssh/authorized_keys; \
+    chown -R vagrant:vagrant /home/vagrant/.ssh
+
+# Run the init daemon
+VOLUME [ "/sys/fs/cgroup" ]
 CMD ["/lib/systemd/systemd"]
