@@ -13,7 +13,7 @@ RUN apt-get update && \
         man-db \
         curl \
         wget \
-        vim-tiny && \
+        vim && \
     apt-get -qq clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -46,4 +46,4 @@ RUN chmod 600 /home/vagrant/.ssh/authorized_keys; \
 
 # Run the init daemon
 VOLUME [ "/sys/fs/cgroup" ]
-CMD ["/lib/systemd/systemd"]
+CMD [ "/lib/systemd/systemd" ]
