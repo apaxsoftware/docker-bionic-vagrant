@@ -1,8 +1,8 @@
 # Vagrant Ubuntu
 
-[![docker pull apax/bionic-vagrant](https://img.shields.io/badge/dockerhub-image-blue.svg?logo=Docker)](https://hub.docker.com/repository/docker/apax/bionic-vagrant)
+[![docker pull apax/vagrant-ubuntu](https://img.shields.io/badge/dockerhub-image-blue.svg?logo=Docker)](https://hub.docker.com/repository/docker/apax/vagrant-ubuntu)
 
-This is the source Dockerfile for the [apax/bionic-vagrant](https://hub.docker.com/repository/docker/apax/bionic-vagrant) docker image.
+These are the source Dockerfiles for the [apax/vagrant-ubuntu](https://hub.docker.com/repository/docker/apax/vagrant-ubuntu) docker images.
 
 ## Building / Tagging
 To build the Ubuntu 18.04 image for both arm and x86:
