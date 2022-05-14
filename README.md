@@ -11,9 +11,14 @@ To build the Ubuntu 18.04 image for both arm and x86:
 docker buildx build --push --platform linux/arm64,linux/amd64 -t apax/vagrant-ubuntu:18.04 -f Dockerfile.bionic .
 ```
 
-
 To build the Ubuntu 20.04 image for both arm and x86:
 
 ```bash
 docker buildx build --push --platform linux/arm64,linux/amd64 -t apax/vagrant-ubuntu:20.04 -f Dockerfile.focal .
+```
+
+To build the Ubuntu 22.04 image for both arm and x86:
+
+```bash
+docker buildx build --push --platform linux/arm64,linux/amd64 -t apax/vagrant-ubuntu:22.04 -f Dockerfile.jammy .
 ```
