@@ -2,7 +2,7 @@
 
 [![docker pull apax/vagrant-ubuntu](https://img.shields.io/badge/dockerhub-image-blue.svg?logo=Docker)](https://hub.docker.com/r/apax/vagrant-ubuntu)
 
-These are the source Dockerfiles for the [apax/vagrant-ubuntu](https://hub.docker.com/repository/docker/apax/vagrant-ubuntu) docker images.
+These are the source Dockerfiles for the [apax/vagrant-ubuntu](https://hub.docker.com/r/apax/vagrant-ubuntu) docker images.
 
 ## Building / Tagging
 To build the Ubuntu 18.04 image for both arm and x86:
